@@ -14,11 +14,13 @@ import { useToast } from '../components/ui/Toast.js';
 import { useConfirm } from '../components/ui/ConfirmDialog.js';
 import { listTurfs, approveTurf, rejectTurf, setTurfStatus } from '../services/turfs.service.js';
 import { listCourts } from '../services/courts.service.js';
+import { listItems } from '../services/masterData.service.js';
 import { validateRejectTurf } from '../validations/schemas.js';
 import type { FieldErrors } from '../validations/validators.js';
 import { formatDate, formatDateTime, statusLabel, fullAddress } from '../lib/format.js';
+import { MASTER_CATEGORY_CODE } from '@turvo/shared';
 import type { TurfDetailDto } from '../types/domain.js';
-import type { CourtDto } from '../types/domain.js';
+import type { CourtDto, MasterItemDto } from '../types/domain.js';
 
 const PAGE_SIZE = 20;
 
@@ -44,6 +46,7 @@ export function TurfsListPage() {
   // Detail modal state
   const [detailTurf, setDetailTurf] = useState<TurfDetailDto | null>(null);
   const [detailCourts, setDetailCourts] = useState<CourtDto[]>([]);
+  const [detailSports, setDetailSports] = useState<MasterItemDto[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
   // Reject modal state
@@ -94,8 +97,12 @@ export function TurfsListPage() {
     setDetailLoading(true);
     setDetailCourts([]);
     try {
-      const courts = await listCourts(turf.id);
+      const [courts, sportResult] = await Promise.all([
+        listCourts(turf.id),
+        listItems({ page: 1, limit: 100, category: MASTER_CATEGORY_CODE.SPORTS }).catch(() => ({ rows: [] })),
+      ]);
       setDetailCourts(courts);
+      setDetailSports(sportResult.rows);
     } catch {
       // courts are non-critical, show empty
     } finally {
@@ -106,6 +113,7 @@ export function TurfsListPage() {
   const closeDetail = () => {
     setDetailTurf(null);
     setDetailCourts([]);
+    setDetailSports([]);
   };
 
   // --- Approve ---
@@ -417,7 +425,7 @@ export function TurfsListPage() {
                     {detailCourts.map((court) => (
                       <tr key={court.id}>
                         <td>{court.name}</td>
-                        <td>{court.sportId}</td>
+                        <td>{detailSports.find(s => s.id === court.sportId)?.name ?? court.sportId}</td>
                         <td>{court.capacity}</td>
                         <td>
                           <Badge tone={statusTone(court.status)}>{statusLabel(court.status)}</Badge>

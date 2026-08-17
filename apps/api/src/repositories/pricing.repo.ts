@@ -40,6 +40,7 @@ function toRule(row: QueryableRow): PricingRuleRow {
 }
 
 export interface ActiveRuleConflictInput {
+  turfId: string;
   courtId: string | null;
   dayType: 'WEEKDAY' | 'WEEKEND';
   startTime: string;
@@ -161,6 +162,7 @@ export function createPricingRepo(db: DbClient) {
      */
     async hasOverlappingActive(input: ActiveRuleConflictInput): Promise<boolean> {
       const params: unknown[] = [
+        input.turfId,
         input.courtId,
         input.dayType,
         input.startTime,
@@ -172,14 +174,15 @@ export function createPricingRepo(db: DbClient) {
       const exclude = input.excludeId ? ` and id <> $${params.length}::uuid` : '';
       const { rows } = await db.query<QueryableRow>(
         `select 1 from public.pricing_rules
-         where court_id is not distinct from $1::uuid
-           and day_type = $2
+         where turf_id = $1::uuid
+           and court_id is not distinct from $2::uuid
+           and day_type = $3
            and status = 'ACTIVE'
-           and start_time < $4::time
-           and end_time > $3::time
-           and (effective_from <= $5::date and (effective_to is null or effective_to >= $5::date))
-           and (coalesce($6::date, 'infinity'::date) >= effective_from)
-           and (effective_to is null or effective_to >= $5::date)${exclude}
+           and start_time < $5::time
+           and end_time > $4::time
+           and (effective_from <= $6::date and (effective_to is null or effective_to >= $6::date))
+           and (coalesce($7::date, 'infinity'::date) >= effective_from)
+           and (effective_to is null or effective_to >= $6::date)${exclude}
          limit 1`,
         params,
       );

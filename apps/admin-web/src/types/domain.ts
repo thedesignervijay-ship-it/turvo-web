@@ -181,21 +181,6 @@ export interface PlatformSettingDto {
   updatedAt: string;
 }
 
-export interface AuditLogDto {
-  id: string;
-  userId: string;
-  userName: string | null;
-  userEmail: string | null;
-  action: string;
-  entityType: string;
-  entityId: string;
-  oldValue: unknown;
-  newValue: unknown;
-  ipAddress: string | null;
-  userAgent: string | null;
-  createdAt: string;
-}
-
 export interface CourtDto {
   id: string;
   turfId: string;

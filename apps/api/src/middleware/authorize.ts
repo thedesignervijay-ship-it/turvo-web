@@ -19,11 +19,3 @@ export function authorize(...required: Permission[]): RequestHandler {
     next();
   };
 }
-
-/**
- * Asserts the authenticated user is a turf owner. Throws 403 otherwise.
- */
-export function requireOwner(req: Request): void {
-  if (!req.auth) throw unauthorized();
-  if (req.auth.user.role !== 'OWNER' || !req.auth.owner) throw forbidden();
-}

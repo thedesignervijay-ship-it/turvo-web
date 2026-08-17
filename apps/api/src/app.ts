@@ -47,11 +47,14 @@ export function createApp(container: Container, options: AppOptions = {}): Expre
   );
   app.use(express.json({ limit: '1mb' }));
 
+  const skipRateLimit = !config.isProd;
+
   const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 1000,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
+    skip: () => skipRateLimit,
     handler: (_req, _res, next) => next(rateLimited()),
   });
   const authLimiter = rateLimit({
@@ -59,6 +62,7 @@ export function createApp(container: Container, options: AppOptions = {}): Expre
     limit: 20,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
+    skip: () => skipRateLimit,
     handler: (_req, _res, next) => next(rateLimited()),
   });
 

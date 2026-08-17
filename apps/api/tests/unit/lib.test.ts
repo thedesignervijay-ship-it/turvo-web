@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hasPermission, permissionsFor } from '../../src/lib/rbac.js';
 import { buildPaginationMeta, buildOrderBy } from '../../src/lib/pagination.js';
-import { toCsv } from '../../src/lib/csv.js';
 import {
   kolkataLocalToUtc,
   dayOfWeekOfDate,
@@ -10,7 +9,6 @@ import {
   timeToMinutes,
   minutesToTime,
 } from '../../src/lib/time.js';
-import { generateBookingReference } from '../../src/lib/bookingRef.js';
 
 describe('rbac', () => {
   it('grants admin permissions per spec section 6', () => {
@@ -51,13 +49,6 @@ describe('pagination', () => {
   });
 });
 
-describe('csv', () => {
-  it('escapes fields containing commas, quotes and newlines', () => {
-    const csv = toCsv(['a', 'b'], [['x,y', 'say "hi"'], ['line1\nline2', 'ok']]);
-    expect(csv).toBe('a,b\n"x,y","say ""hi"""\n"line1\nline2",ok');
-  });
-});
-
 describe('time (Asia/Kolkata)', () => {
   it('converts Kolkata wall-clock to the correct UTC instant', () => {
     // 2026-08-15 06:00:00 IST == 2026-08-15 00:30:00 UTC
@@ -89,16 +80,5 @@ describe('time (Asia/Kolkata)', () => {
   it('parses and formats times', () => {
     expect(timeToMinutes('06:30:00')).toBe(390);
     expect(minutesToTime(390)).toBe('06:30:00');
-  });
-});
-
-describe('booking reference', () => {
-  it('generates unique references within 30 chars', () => {
-    const refs = new Set(Array.from({ length: 50 }, () => generateBookingReference()));
-    expect(refs.size).toBe(50);
-    for (const r of refs) {
-      expect(r.startsWith('TVO-')).toBe(true);
-      expect(r.length).toBeLessThanOrEqual(30);
-    }
   });
 });

@@ -128,9 +128,9 @@ export function BookingsListPage() {
             tone="green"
           />
           <StatCard
-            label="Confirmed"
+            label="This Month"
             value={String(stats.monthBookings)}
-            icon="&#9989;"
+            icon="&#128197;"
             tone="info"
           />
           <StatCard

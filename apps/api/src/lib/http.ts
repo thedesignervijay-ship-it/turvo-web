@@ -21,7 +21,7 @@ export function sendPaginated(
   pagination: PaginationMeta,
   message = 'Success',
 ): void {
-  res.status(200).json({ success: true, data, message, pagination });
+  res.status(200).json({ success: true, data: { items: data, pagination }, message });
 }
 
 export function sendCreated(

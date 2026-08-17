@@ -1,20 +1,8 @@
-import { z } from 'zod';
-
 /**
  * Collection query parameters (spec section 31):
  *   page (default 1), limit (default 20, max 100),
  *   search, sort, sortOrder (asc|desc).
  */
-
-export const paginationSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-  search: z.string().trim().max(255).optional(),
-  sort: z.string().trim().max(100).optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
-});
-
-export type PaginationQuery = z.infer<typeof paginationSchema>;
 
 export interface PaginationMeta {
   page: number;

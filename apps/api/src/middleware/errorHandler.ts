@@ -100,10 +100,3 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
   res.status(mapped.status).json(errorBody(mapped));
 };
-
-export function requestLogger(req: Request): void {
-  // eslint-disable-next-line no-console
-  console.info(`${req.method} ${req.originalUrl}`);
-}
-
-export { errorBody };

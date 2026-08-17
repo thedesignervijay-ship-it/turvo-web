@@ -35,6 +35,7 @@ export function createPricingService(deps: {
     excludeId?: string,
   ) => {
     const overlaps = await deps.pricingRepo.hasOverlappingActive({
+      turfId,
       courtId: input.courtId,
       dayType: input.dayType,
       startTime: input.startTime,
